@@ -39,7 +39,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final DatabaseReference _database = FirebaseDatabase.instance.ref("fall_data");
+  final DatabaseReference _healthDatabase = FirebaseDatabase.instance.ref("health_metrics");
   Map<String, dynamic>? sensorData;
+  double? heartRate;
 
   @override
   void initState() {
@@ -48,14 +50,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _fetchLatestData() {
+    // Fetch fall detection data
     _database.orderByKey().limitToLast(1).onValue.listen((event) {
       if (event.snapshot.value != null) {
         final Map<dynamic, dynamic> data = event.snapshot.value as Map;
         final String latestTimestamp = data.keys.first;
         final Map<String, dynamic> latestEntry = Map<String, dynamic>.from(data[latestTimestamp]);
         final String uniqueKey = latestEntry.keys.first;
+        
         setState(() {
           sensorData = Map<String, dynamic>.from(latestEntry[uniqueKey]);
+        });
+      }
+    });
+
+    // Fetch heart rate data
+    _healthDatabase.orderByKey().limitToLast(1).onValue.listen((event) {
+      if (event.snapshot.value != null) {
+        final Map<dynamic, dynamic> healthData = event.snapshot.value as Map;
+        final String latestTimestamp = healthData.keys.first;
+        setState(() {
+          heartRate = (healthData[latestTimestamp]["heartRate"] as num).toDouble();
         });
       }
     });
@@ -81,6 +96,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     "Y: ${sensorData!["gyro_y"]}",
                     "Z: ${sensorData!["gyro_z"]}"
                   ]),
+                  _buildMetricCard(
+                    "Heart Rate (BPM)",
+                    Icons.favorite,
+                    ["${heartRate?.toStringAsFixed(2) ?? 'N/A'}"],
+                  ),
                   GestureDetector(
                     onTap: () {
                       if (sensorData!["fall_alert"] == true) {
@@ -176,16 +196,15 @@ class FallLocationScreen extends StatelessWidget {
           MarkerLayer(
             markers: [
               Marker(
-  width: 50.0,
-  height: 50.0,
-  point: LatLng(latitude, longitude),
-  child: const Icon(  
-    Icons.location_pin,
-    color: Colors.red,
-    size: 40,
-  ),
-),
-
+                width: 50.0,
+                height: 50.0,
+                point: LatLng(latitude, longitude),
+                child: const Icon(  
+                  Icons.location_pin,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
             ],
           ),
         ],
@@ -193,19 +212,3 @@ class FallLocationScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

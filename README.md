@@ -58,5 +58,10 @@ Want to contribute? Follow these steps:
 This project is licensed under the **MIT License**.
 
 ---
-Made with ❤️ by the NeuroWheelX Team 🚀
+## Contributors
+
+* Harini Priyanka W (CB.EN.U4CSE22018)
+* Mogitha S M (CB.EN.U4CSE22027)
+* Prahalyaa A (CB.EN.U4CSE22432)
+
 

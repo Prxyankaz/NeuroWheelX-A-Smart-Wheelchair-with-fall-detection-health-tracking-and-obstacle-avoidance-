@@ -7,7 +7,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-// WiFi Credentials
+// WiFi details
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
 
